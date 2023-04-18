@@ -677,9 +677,7 @@ public class SelectorTest {
         selector = new Selector(NetworkReceive.UNLIMITED, CONNECTION_MAX_IDLE_MS, metrics, time, "MetricGroup",
             new HashMap<>(), true, false, channelBuilder, pool, new LogContext());
 
-        try (ServerSocketChannel ss = ServerSocketChannel.open()) {
-            ss.bind(new InetSocketAddress(0));
-
+        try (ServerSocketChannel ss = TestUtils.createSocketServerChannel(new InetSocketAddress(0), false)) {
             InetSocketAddress serverAddress = (InetSocketAddress) ss.getLocalAddress();
 
             Thread sender1 = createSender(serverAddress, randomPayload(900));
@@ -808,9 +806,7 @@ public class SelectorTest {
     @Test
     public void testInboundConnectionsCountInConnectionCreationMetric() throws Exception {
         int conns = 5;
-
-        try (ServerSocketChannel ss = ServerSocketChannel.open()) {
-            ss.bind(new InetSocketAddress(0));
+        try (ServerSocketChannel ss = TestUtils.createSocketServerChannel(new InetSocketAddress(0), false)) {
             InetSocketAddress serverAddress = (InetSocketAddress) ss.getLocalAddress();
 
             for (int i = 0; i < conns; i++) {
@@ -834,8 +830,7 @@ public class SelectorTest {
             ClientInformation.UNKNOWN_NAME_OR_VERSION, ClientInformation.UNKNOWN_NAME_OR_VERSION);
         Map<String, String> knownNameAndVersion = softwareNameAndVersionTags("A", "B");
 
-        try (ServerSocketChannel ss = ServerSocketChannel.open()) {
-            ss.bind(new InetSocketAddress(0));
+        try (ServerSocketChannel ss = TestUtils.createSocketServerChannel(new InetSocketAddress(0), false)) {
             InetSocketAddress serverAddress = (InetSocketAddress) ss.getLocalAddress();
 
             Thread sender = createSender(serverAddress, randomPayload(1));

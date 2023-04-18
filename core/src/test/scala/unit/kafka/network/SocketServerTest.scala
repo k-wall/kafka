@@ -243,6 +243,15 @@ class SocketServerTest {
   }
 
   @Test
+  def testServerChannel(): Unit = {
+    server.dataPlaneAcceptors.values().forEach { acceptor =>
+      assertFalse(acceptor.serverChannel.isBlocking)
+      assertTrue(acceptor.serverChannel.socket().getReuseAddress)
+      assertTrue(acceptor.serverChannel.socket().isBound)
+    }
+  }
+
+  @Test
   def simpleRequest(): Unit = {
     val plainSocket = connect()
     val serializedBytes = producerRequestBytes()

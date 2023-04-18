@@ -107,9 +107,7 @@ public class NioEchoServer extends Thread {
             int failedAuthenticationDelayMs, Time time, DelegationTokenCache tokenCache) throws Exception {
         super("echoserver");
         setDaemon(true);
-        serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.configureBlocking(false);
-        serverSocketChannel.socket().bind(new InetSocketAddress(serverHost, 0));
+        serverSocketChannel = TestUtils.createSocketServerChannel(new InetSocketAddress(serverHost, 0), true);
         this.port = serverSocketChannel.socket().getLocalPort();
         this.socketChannels = Collections.synchronizedList(new ArrayList<>());
         this.newChannels = Collections.synchronizedList(new ArrayList<>());

@@ -37,7 +37,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ServerSocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -592,5 +594,15 @@ public class TestUtils {
         iterator2.forEachRemaining(expectedSegmentsSet::add);
 
         return allSegmentsSet.equals(expectedSegmentsSet);
+    }
+
+    public static ServerSocketChannel createSocketServerChannel(InetSocketAddress socketAddress, boolean nonBlock) throws IOException {
+        ServerSocketChannel serverChannel = ServerSocketChannel.open();
+        if (nonBlock) {
+            serverChannel.configureBlocking(false);
+        }
+        serverChannel.socket().setReuseAddress(true);
+        serverChannel.bind(socketAddress);
+        return serverChannel;
     }
 }

@@ -259,9 +259,7 @@ public abstract class SslSelectorTest extends SelectorTest {
         selector = new Selector(NetworkReceive.UNLIMITED, 5000, metrics, time, "MetricGroup",
                 new HashMap<>(), true, false, channelBuilder, pool, new LogContext());
 
-        try (ServerSocketChannel ss = ServerSocketChannel.open()) {
-            ss.bind(new InetSocketAddress(0));
-
+        try (ServerSocketChannel ss = TestUtils.createSocketServerChannel(new InetSocketAddress(0), false)) {
             InetSocketAddress serverAddress = (InetSocketAddress) ss.getLocalAddress();
 
             SslSender sender1 = createSender(tlsProtocol, serverAddress, randomPayload(900));
