@@ -27,6 +27,7 @@ import org.jose4j.lang.InvalidAlgorithmException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.Set;
 
 import static org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule.OAUTHBEARER_MECHANISM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -92,6 +93,24 @@ public class BrokerJwtValidatorTest extends JwtValidatorTest {
         assertEquals(builder.issuedAtSeconds() * 1000, token.startTimeMs());
         assertEquals(builder.expirationSeconds() * 1000, token.lifetimeMs());
         assertEquals(1, token.scope().size());
+    }
+
+    @Test
+    void testScopesProcessedAccordingToRFC8693() throws Exception {
+        PublicJsonWebKey jwk = createRsaJwk();
+        AccessTokenBuilder tokenBuilder = new AccessTokenBuilder()
+                .jwk(jwk)
+                .alg(AlgorithmIdentifiers.RSA_USING_SHA256)
+                .scope("email profile phone address")
+                .subject("sub");
+        JwtValidator validator = createJwtValidator(tokenBuilder);
+        Map<String, ?> saslConfigs = getSaslConfigs();
+        validator.configure(saslConfigs, OAUTHBEARER_MECHANISM, getJaasConfigEntries());
+
+        OAuthBearerToken token = validator.validate(tokenBuilder.build());
+
+        assertEquals(Set.of("email", "phone", "profile", "address"), token.scope());
+//        assertEquals(Set.of("email profile phone address"), token.scope());
     }
 
 }
